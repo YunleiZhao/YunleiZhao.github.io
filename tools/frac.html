@@ -122,15 +122,15 @@
 
         const fractionToPercent = [
             { numerator: 1, denominator: 2, percent: 50 },
+            { numerator: 3, denominator: 7, percent: 43.9 },
             { numerator: 1, denominator: 3, percent: 33.3 },
+            { numerator: 2, denominator: 7, percent: 28.6 },
             { numerator: 1, denominator: 4, percent: 25 },
             { numerator: 1, denominator: 5, percent: 20 },
             { numerator: 1, denominator: 6, percent: 16.7 },
             { numerator: 1, denominator: 7, percent: 14.3 },
             { numerator: 1, denominator: 8, percent: 12.5 },
             { numerator: 1, denominator: 9, percent: 11.1 },
-            { numerator: 2, denominator: 7, percent: 28.6 },
-            { numerator: 3, denominator: 7, percent: 43.9 },
         ];
 
         function startTimer() {
@@ -147,9 +147,9 @@
 
         function getDynamicRange(percent) {
             if (percent >= 50) {
-                return 4.0; // 对于较大的百分比，允许较大的浮动范围
+                return 3.6; // 对于较大的百分比，允许较大的浮动范围
             } else if (percent >= 25) {
-                return 2.0; // 中等浮动范围
+                return 1.6; // 中等浮动范围
             } else if (percent >= 10) {
                 return 0.6; // 较小浮动范围
             } else {
