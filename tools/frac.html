@@ -223,6 +223,7 @@
             document.getElementById('question').textContent = `${randomPercent}%`;
             document.getElementById('fraction-display').textContent = '-/-';
             document.getElementById('fraction-display').classList.remove('correct', 'incorrect');
+            stopTimer();
             startTimer();
             document.getElementById('next-btn').textContent = '下一题';
         }
