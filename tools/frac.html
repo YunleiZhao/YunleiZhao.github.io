@@ -93,7 +93,7 @@
 <body>
     <div class="question" id="question">点击开始</div>
     <div class="timer" id="timer">用时: 0.000s</div>
-    <div id="fraction-display">-/-</div>
+    <div id="fraction-display" onclick="showAnswer()">-/-</div>
     <div class="buttons">
         <button onclick="inputNumber(1)" id="btn-1">1</button>
         <button onclick="inputNumber(2)" id="btn-2">2</button>
@@ -258,6 +258,14 @@
                         updateFractionDisplay(0);
                     }, 500);
                 }
+            }
+        }
+
+        function showAnswer() {
+            if (currentAnswer) {
+                userNumerator = currentAnswer.numerator;
+                userDenominator = currentAnswer.denominator;
+                checkAnswer();
             }
         }
 
