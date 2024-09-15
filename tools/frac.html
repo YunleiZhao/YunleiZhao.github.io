@@ -71,12 +71,14 @@
         #fraction-display {
             font-size: 2em;
             margin-bottom: 20px;
-            margin-top: 20px; /* 添加上间距 */
+            margin-top: 20px;
             padding: 10px;
             border-radius: 10px;
             border: 2px solid #6c757d;
-            width: 100px;
+            width: auto;
             text-align: center;
+            height: auto; /* 自动高度 */
+            line-height: normal; /* 正常行高 */
         }
         .correct {
             border-color: #28a745 !important;
@@ -118,7 +120,7 @@
         let currentAnswer;
         let userNumerator = '';
         let userDenominator = '';
-        let inputStage = 0; // 0: 输入分子, 1: 输入分母
+        let inputStage = 0; // 0: 输入分子, 1: 输入分母 (第一位), 2: 输入分母 (第二位)
 
         const fractionToPercent = [
             { numerator: 1, denominator: 2, percent: 50 },
@@ -131,6 +133,17 @@
             { numerator: 1, denominator: 7, percent: 14.3 },
             { numerator: 1, denominator: 8, percent: 12.5 },
             { numerator: 1, denominator: 9, percent: 11.1 },
+            { numerator: 1, denominator: 10, percent: 10},
+            { numerator: 1, denominator: 11, percent: 9.1},
+            { numerator: 1, denominator: 12, percent: 8.3},
+            { numerator: 1, denominator: 13, percent: 7.7},
+            { numerator: 1, denominator: 14, percent: 7.1},
+            { numerator: 1, denominator: 15, percent: 6.7},
+            { numerator: 1, denominator: 16, percent: 6.3},
+            { numerator: 1, denominator: 17, percent: 5.9},
+            { numerator: 1, denominator: 18, percent: 5.6},
+            { numerator: 1, denominator: 19, percent: 5.3},
+            { numerator: 1, denominator: 20, percent: 5},
         ];
 
         function startTimer() {
@@ -146,14 +159,17 @@
         }
 
         function getDynamicRange(percent) {
-            if (percent >= 50) {
-                return 3.6; // 对于较大的百分比，允许较大的浮动范围
-            } else if (percent >= 25) {
-                return 1.6; // 中等浮动范围
-            } else if (percent >= 10) {
-                return 0.6; // 较小浮动范围
+            return 0;
+            if(percent >= 30) {
+                return 2.0;
+            } else if(percent >= 20) {
+                return 1.0
+            } else if(percent >= 10) {
+                return 0.4;
+            } else if(percent >= 5) {
+                return 0.2;
             } else {
-                return 0.4; // 最小浮动范围
+                return 0;
             }
         }
 
@@ -162,18 +178,20 @@
             const { numerator, denominator, percent } = fractionToPercent[randomIndex];
             const dynamicRange = getDynamicRange(percent);
             const randomPercent = (percent + (Math.random() * dynamicRange - dynamicRange / 2)).toFixed(1);
-            document.getElementById('question').textContent = `${randomPercent}%`;
+            
             currentAnswer = { numerator, denominator };
 
             userNumerator = '';
             userDenominator = '';
             inputStage = 0;
-            document.getElementById('fraction-display').textContent = '-/-';
-            document.getElementById('fraction-display').classList.remove('correct', 'incorrect');
+            return randomPercent;
         }
 
         function nextQuestion() {
-            generateQuestion();
+            randomPercent = generateQuestion();
+            document.getElementById('question').textContent = `${randomPercent}%`;
+            document.getElementById('fraction-display').textContent = '-/-';
+            document.getElementById('fraction-display').classList.remove('correct', 'incorrect');
             startTimer();
             document.getElementById('next-btn').textContent = '下一题';
         }
@@ -182,16 +200,31 @@
             if (inputStage === 0) {
                 userNumerator = num;
                 inputStage = 1;
-            } else {
-                userDenominator = num;
+            } else if (inputStage === 1) {
+                if (num === 1) {
+                    userDenominator = num;
+                    inputStage = 2;
+                    isDouble = true;
+                } else {
+                    userDenominator = num;
+                    inputStage = 0;
+                    checkAnswer();
+                }
+            } else if (inputStage === 2) {
+                userDenominator = userDenominator * 10 + num;
                 inputStage = 0;
+                checkAnswer();
             }
-            updateFractionDisplay();
-            checkAnswer();
+            updateFractionDisplay(inputStage);
         }
 
-        function updateFractionDisplay() {
-            document.getElementById('fraction-display').textContent = `${userNumerator || '-'}/${userDenominator || '-'}`;
+        function updateFractionDisplay(inputStage) {
+            if(inputStage === 2) {
+                document.getElementById('fraction-display').textContent = `${userNumerator || '-'}/${userDenominator}-`;
+            } 
+            else {
+                document.getElementById('fraction-display').textContent = `${userNumerator || '-'}/${userDenominator || '-'}`;
+            }
         }
 
         function checkAnswer() {
@@ -202,8 +235,14 @@
                 if (isCorrect) {
                     displayElement.classList.add('correct');
                     stopTimer();
+                    setTimeout(() => {
+                        displayFormula();
+                    }, 100);
+                    
                     if (continuousMode) {
-                        setTimeout(nextQuestion, 500);
+                        setTimeout(() => {
+                            nextQuestion();
+                        }, 2000);
                     }
                 } else {
                     displayElement.classList.add('incorrect');
@@ -211,10 +250,15 @@
                         displayElement.classList.remove('incorrect');
                         userNumerator = '';
                         userDenominator = '';
-                        updateFractionDisplay();
+                        updateFractionDisplay(0);
                     }, 500);
                 }
             }
+        }
+
+        function displayFormula() {
+            const displayElement = document.getElementById('fraction-display');
+            displayElement.textContent = `${currentAnswer.numerator}/${currentAnswer.denominator} = ${(currentAnswer.numerator / currentAnswer.denominator * 100).toFixed(1)}%`;
         }
 
         function toggleMode() {
