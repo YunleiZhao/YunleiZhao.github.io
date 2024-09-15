@@ -206,7 +206,7 @@
                 userNumerator = num;
                 inputStage = 1;
             } else if (inputStage === 1) {
-                if (num === 1) {
+                if (currentAnswer.denominator>=10) {
                     userDenominator = num;
                     inputStage = 2;
                     isDouble = true;
